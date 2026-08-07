@@ -12,6 +12,12 @@ export const calendarQuerySchema = z.object({
     .openapi({ param: { name: "quarter", in: "query" }, example: "Fall" }),
 });
 
+export const calendarTermHolidaySchema = z.object({
+  name: z.string().openapi({ example: "Thanksgiving" }),
+  startDate: z.string().openapi({ example: "2024-11-28" }),
+  endDate: z.string().openapi({ example: "2024-11-29" }),
+});
+
 export const calendarTermSchema = z.object({
   year: z.string().openapi({ example: "2024" }),
   quarter: z.enum(terms).openapi({ example: "Fall" }),
@@ -20,4 +26,7 @@ export const calendarTermSchema = z.object({
   finalsStart: z.string().openapi({ example: "2024-12-07" }),
   finalsEnd: z.string().openapi({ example: "2024-12-13" }),
   socAvailable: z.string().openapi({ example: "2024-05-04" }),
+  holidays: z.array(calendarTermHolidaySchema).openapi({
+    example: [{ name: "Thanksgiving", startDate: "2024-11-28", endDate: "2024-11-29" }],
+  }),
 });

@@ -1,5 +1,5 @@
 import { type SQL, sql } from "drizzle-orm";
-import { date, pgTable, varchar } from "drizzle-orm/pg-core";
+import { date, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
 import { term } from "./websoc.ts";
 
 export const calendarTerm = pgTable("calendar_term", {
@@ -17,3 +17,16 @@ export const calendarTerm = pgTable("calendar_term", {
   finalsEnd: date("finals_end", { mode: "date" }).notNull(),
   socAvailable: date("soc_available", { mode: "date" }).notNull(),
 });
+
+export const calendarTermHoliday = pgTable(
+  "calendar_term_holiday",
+  {
+    termId: varchar("term_id")
+      .notNull()
+      .references(() => calendarTerm.id, { onDelete: "cascade" }),
+    name: varchar("name", { length: 200 }).notNull(),
+    startDate: date("start_date", { mode: "string" }).notNull(),
+    endDate: date("end_date", { mode: "string" }).notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.termId, table.name, table.startDate] })],
+);

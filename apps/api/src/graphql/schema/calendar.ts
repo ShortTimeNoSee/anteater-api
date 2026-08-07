@@ -1,4 +1,10 @@
 export const calendarSchema = `#graphql
+type CalendarTermHoliday {
+    name: String!
+    startDate: String!
+    endDate: String!
+}
+
 type CalendarTerm @cacheControl(maxAge: 86400) {
     year: String!
     quarter: Term!
@@ -7,6 +13,7 @@ type CalendarTerm @cacheControl(maxAge: 86400) {
     finalsStart: String!
     finalsEnd: String!
     socAvailable: String!
+    holidays: [CalendarTermHoliday!]!
 }
 
 extend type Query {
