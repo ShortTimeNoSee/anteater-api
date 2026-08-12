@@ -7,8 +7,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { editUserApiKey, getUserApiKeyData, getUserKeysNames } from "@/app/actions/keys";
-import { type CreateKeyFormValues, createRefinedKeySchema } from "@/app/actions/types";
+import { editKey, getKeyById, getKeyNamesOwnedBy } from "@/app/actions/keys";
+import { type CreateKeyFormValues, keyFormSchema, keyStorageCodec } from "@/app/actions/types";
 
 import DeleteKey from "@/components/key/DeleteKey";
 import NameField from "@/components/key/form/NameField";
@@ -45,7 +45,7 @@ const EditKey = () => {
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const form = useForm<CreateKeyFormValues>({
-    resolver: zodResolver(createRefinedKeySchema),
+    resolver: zodResolver(keyFormSchema),
   });
 
   useEffect(() => {
@@ -56,33 +56,23 @@ const EditKey = () => {
         return router.push("/");
       }
 
-      const validKeys = await getUserKeysNames(session.user.id);
+      const validKeys = await getKeyNamesOwnedBy(session.user.id);
       if (!validKeys.includes(key)) {
         return router.push("/");
       }
 
       try {
-        const data = await getUserApiKeyData(key);
+        const data = await getKeyById(key);
 
         if (!data) {
           setError(`Key ${key} does not exist`);
           return;
         }
 
-        const formattedData = {
-          ...data,
-          origins:
-            data._type === "publishable"
-              ? Object.entries(data.origins).map(([url]) => ({
-                  url,
-                }))
-              : [],
-          createdAt: new Date(data.createdAt),
-        };
+        const encoded = keyStorageCodec.encode(data);
+        form.reset(encoded);
 
-        form.reset(formattedData);
-
-        setKeyData(formattedData);
+        setKeyData(encoded);
         setLoading(false);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "An error occurred while fetching key data.");
@@ -95,7 +85,7 @@ const EditKey = () => {
   const onSubmit = async (values: CreateKeyFormValues) => {
     try {
       setIsSaving(true);
-      await editUserApiKey(key, values);
+      await editKey(key, values);
       setIsSaving(false);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "An error occurred while editing the key.");
@@ -110,7 +100,7 @@ const EditKey = () => {
             <ChevronLeft />
           </Link>
         </Button>
-        <HeadingText>Edit Key</HeadingText>
+        <HeadingText>Edit key</HeadingText>
       </div>
 
       {loading ? (

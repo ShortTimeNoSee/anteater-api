@@ -7,8 +7,8 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { createUserApiKey } from "@/app/actions/keys";
-import { type CreateKeyFormValues, createRefinedKeySchema } from "@/app/actions/types";
+import { createKey } from "@/app/actions/keys";
+import { type CreateKeyFormValues, keyFormSchema } from "@/app/actions/types";
 import NameField from "@/components/key/form/NameField";
 import OriginsField from "@/components/key/form/OriginsField";
 import RateLimitOverrideField from "@/components/key/form/RateLimitOverrideField";
@@ -33,7 +33,7 @@ const CreateKey = () => {
   }, [session, router]);
 
   const formProps = {
-    resolver: zodResolver(createRefinedKeySchema),
+    resolver: zodResolver(keyFormSchema),
     defaultValues: {
       _type: "" as CreateKeyFormValues["_type"],
       name: "",
@@ -53,7 +53,7 @@ const CreateKey = () => {
 
   async function onSubmit(values: CreateKeyFormValues) {
     setIsCreating(true);
-    const result = await createUserApiKey(values);
+    const result = await createKey(values);
     if (result.ok) {
       setKey(result.key);
       setIsDialogOpen(true);
@@ -77,7 +77,7 @@ const CreateKey = () => {
             <ChevronLeft />
           </Link>
         </Button>
-        <HeadingText>Create Key</HeadingText>
+        <HeadingText>Create key</HeadingText>
       </div>
 
       <Form {...form}>
