@@ -6,7 +6,7 @@ export const formOriginSchema = z.object({ url: originSchema });
 
 const keyFormBaseSchema = z.object({
   name: z.string().min(1).max(30),
-  rateLimitOverride: z.number().positive().optional(),
+  rateLimitOverride: z.number().nonnegative().optional(),
   resources: z.record(z.enum(accessControlledResources), z.boolean()).optional(),
 });
 
@@ -39,7 +39,7 @@ export const keyStorageBaseSchema = keyFormBaseSchema.extend({
   createdAt: z.coerce.date(),
 });
 
-export const keyStorageCodec = z.codec(
+export const keyFormCodec = z.codec(
   keyFormSchema,
   z.discriminatedUnion("_type", [
     keyStorageBaseSchema.extend({

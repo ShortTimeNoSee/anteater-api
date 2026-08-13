@@ -22,7 +22,7 @@ import ButtonSpinner from "@/components/ui/button-spinner";
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 
-const CreateKey = () => {
+function CreateKey() {
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -55,7 +55,7 @@ const CreateKey = () => {
     setIsCreating(true);
     const result = await createKey(values);
     if (result.ok) {
-      setKey(result.key);
+      setKey(result.keyId);
       setIsDialogOpen(true);
     } else {
       setError(result.error);
@@ -63,11 +63,11 @@ const CreateKey = () => {
     setIsCreating(false);
   }
 
-  const handleDialogClose = (isOpen: boolean) => {
+  function handleDialogClose(isOpen: boolean) {
     if (!isOpen && key) {
       router.push(`/edit/${key}`);
     }
-  };
+  }
 
   return (
     <div className={"content"}>
@@ -120,19 +120,13 @@ const CreateKey = () => {
 
             <DisplayKey keyText={key} background />
             <DialogFooter>
-              <Button
-                onClick={() => {
-                  handleDialogClose(false);
-                }}
-              >
-                Close
-              </Button>
+              <Button onClick={handleDialogClose.bind(undefined, false)}>Close</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       )}
     </div>
   );
-};
+}
 
 export default CreateKey;

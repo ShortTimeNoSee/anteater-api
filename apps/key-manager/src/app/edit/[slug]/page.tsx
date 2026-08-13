@@ -7,8 +7,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { editKey, getKeyById, getKeyNamesOwnedBy } from "@/app/actions/keys";
-import { type CreateKeyFormValues, keyFormSchema, keyStorageCodec } from "@/app/actions/types";
+import { editKey, getKeyById, getKeysOwnedBy } from "@/app/actions/keys";
+import { type CreateKeyFormValues, keyFormCodec, keyFormSchema } from "@/app/actions/types";
 
 import DeleteKey from "@/components/key/DeleteKey";
 import NameField from "@/components/key/form/NameField";
@@ -24,7 +24,7 @@ import ButtonSpinner from "@/components/ui/button-spinner";
 import { Form } from "@/components/ui/form";
 import Placeholder from "@/components/ui/placeholder";
 
-const EditKey = () => {
+function EditKey() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -56,7 +56,7 @@ const EditKey = () => {
         return router.push("/");
       }
 
-      const validKeys = await getKeyNamesOwnedBy(session.user.id);
+      const validKeys = await getKeysOwnedBy(session.user.id);
       if (!validKeys.includes(key)) {
         return router.push("/");
       }
@@ -69,7 +69,7 @@ const EditKey = () => {
           return;
         }
 
-        const encoded = keyStorageCodec.encode(data);
+        const encoded = keyFormCodec.encode(data);
         form.reset(encoded);
 
         setKeyData(encoded);
@@ -153,6 +153,6 @@ const EditKey = () => {
       )}
     </div>
   );
-};
+}
 
 export default EditKey;
